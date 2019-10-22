@@ -23,7 +23,12 @@ const typeDefs = gql `
     episode:[String]
     gender:String
     url: String
+    image: String
 
+  }
+  type Episodes{
+    name: String
+    id: String
   }
 
   # The "Query" type is the root of all GraphQL queries.
@@ -31,6 +36,7 @@ const typeDefs = gql `
   type Query {
     characters:[Character]
     character(id:ID!):Character
+    episodes: [Episodes]
   }
 `;
 
@@ -41,8 +47,10 @@ const resolvers = {
     characters: () => fetchCharacters(),
     character: (parent,args) => {
       const {id} = args
+      console.log(parent)
       return fetchCharacterById(id)
-    }
+    },
+    episodes:()=>fetchEpisodes()
   }
 };
 
@@ -51,7 +59,11 @@ const resolvers = {
 // responsible for fetching the data for those types.
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  engine: {
+    apiKey: process.env.ENGINE_API_KEY,
+    schemaTag: "production"
+  }
 });
 
 // This `listen` method launches a web-server.  Existing apps
